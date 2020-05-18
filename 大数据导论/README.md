@@ -1,0 +1,3 @@
+包含文件：小组数据报告，爬虫文件
+
+zhihu为爬取时编写的Scrapy爬虫，需要安装Scrapy对应开发环境并配置好本地Mongodb环境后修改zhihu.py和settings.py后才可以运行。
