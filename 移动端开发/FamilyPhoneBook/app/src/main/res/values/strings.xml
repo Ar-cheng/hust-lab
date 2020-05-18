@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FamilyPhoneBook</string>
+    <string name="address">湖北 武汉</string>
+    <string name="phonenumber">123456789</string>
+    <string name="type">同学</string>
+    <string name="title_activity_sub">SubActivity</string>
+</resources>

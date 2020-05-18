@@ -1,0 +1,8 @@
+socket编程：
+vs项目编译时关掉SDL检查
+
+可靠数据传输中：
+vs项目编译时关掉SDL检查
+input,output分别为输入输出
+check_GBN,check_SR,check_TCP为对应的检查脚本
+result1，result2，result3为可执行文件的输出结果重定向到文件中

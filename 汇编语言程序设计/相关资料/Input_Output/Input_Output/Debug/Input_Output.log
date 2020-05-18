@@ -1,0 +1,14 @@
+﻿生成启动时间为 2018/09/08 19:21:32。
+     1>项目“H:\Input_Output\Input_Output\Input_Output.vcxproj”在节点 2 上(Build 个目标)。
+     1>_MASM:
+         Assembling input_output.asm...
+         cmd.exe /C "C:\Users\Administrator\AppData\Local\Temp\tmpbf13632765874665b3087195e8474ab6.cmd"
+         ml.exe /c /nologo /Zi /Fo"Debug\input_output.obj" /W3 /errorReport:prompt  /Tainput_output.asm
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"H:\Input_Output\Debug\Input_Output.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"H:\Input_Output\Debug\Input_Output.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"H:\Input_Output\Debug\Input_Output.lib" /MACHINE:X86 Debug\input_output.obj
+         Input_Output.vcxproj -> H:\Input_Output\Debug\Input_Output.exe
+     1>已完成生成项目“H:\Input_Output\Input_Output\Input_Output.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:00.98

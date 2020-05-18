@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>小学口算题</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/vue.min.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/echarts-gl.min.js"></script>
+    <script src="js/ecStat.min.js"></script>
+    <script src="js/bmap.min.js"></script>
+    <script src="js/dataTool.min.js"></script>
+
+</head>
+<body>
+<div id="APP">
+    <!--navbar-->
+    <nav class="navbar navbar-expand-md bg-light navbar-light navbar-fixed-top">
+        <!-- Brand -->
+        <a class="navbar-brand">ORAL</a>
+        <!-- Toggler/collapsibe Button -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- Navbar links -->
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @click="temp_page=1">settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @click="temp_page=2">在线测试</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" @click="wrong_analyze">错题分析</a>
+                </li>
+                <li v-if="question_num>=0" class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop0" data-toggle="dropdown">
+                        题目选项
+                    </a>
+                    <div class="dropdown-menu">
+                        <a disabled="question_num>=0" class="dropdown-item" href="#" @click="temp_page=3">试题列表</a>
+                        <a class="dropdown-item" href="#" @click="doPrint">打印题目</a>
+                        <a class="dropdown-item" href="#" @click="display">重新生成</a>
+                        <!--                        <a class="dropdown-item" href="#" @click="wrong_analyze">错题分析</a>-->
+                        <a class="dropdown-divider"></a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop1" data-toggle="dropdown">
+                        我的账户
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">log in(待开发)</a>
+                        <a class="dropdown-item" href="#">log out(待开发)</a>
+                        <a class="dropdown-item" href="#">info(待开发)</a>
+                        <a class="dropdown-divider"></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--    页面1 生成设置-->
+    <div class="container col-sm-10" v-cloak>
+        <!-- card   -->
+        <div v-if="temp_page==1" class="card bg-light" style="width:100%;margin-top: 1%">
+            <!--题目类型-->
+            <div class="row">
+                <form class="input-group" style="padding: 15px">
+                    <a style="padding-top: 10px;padding-left: 15px">题目类型：</a>
+                    <div class="btn-group" data-toggle="buttons" style="width:60%">
+                        <label :class="{ active: isadd, 'btn-danger': isadd, 'btn-default': !isadd}"
+                               class="btn col-sm-2"
+                               @click="isadd=!isadd">
+                            加法 </label>
+                        <label :class="{ active: issub, 'btn-warning': issub, 'btn-default': !issub }"
+                               class="btn col-sm-2"
+                               @click="issub=!issub">
+                            减法 </label>
+                        <label :class="{ active: ismul, 'btn-primary': ismul, 'btn-default': !ismul }"
+                               class="btn col-sm-2"
+                               @click="ismul=!ismul">
+                            乘法 </label>
+                        <label :class="{ active: isdiv, 'btn-success': isdiv, 'btn-default': !isdiv }"
+                               class="btn col-sm-2"
+                               @click="isdiv=!isdiv">
+                            除法 </label>
+                    </div>
+                </form>
+            </div>
+
+            <!--运算项个数 求解目标-->
+            <div class="row">
+                <form class="input-group" style="padding: 15px;padding-top: 0px">
+                    <a style="padding-top: 10px;padding-left: 15px">运算项个数：</a>
+                    <select disabled v-model="item_count" class="form-control col-sm-1">
+                        <option selected value="1">随机</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+
+                    <a style="padding-top: 10px;padding-left: 15px">求解目标：</a>
+                    <select v-model="compute_dest" class="form-control col-sm-2">
+                        <option selected value="random">随机</option>
+                        <option value="result">结果</option>
+                        <option value="op">运算项</option>
+                    </select>
+                </form>
+            </div>
+
+            <!--题目数目-->
+            <div class="row" style="padding-bottom: 0px;margin-bottom: 0px">
+                <form class="input-group" style="padding: 15px;padding-top: 0px">
+                    <a style="padding-top: 10px;padding-left: 15px">题目数目： </a>
+                    <input type="number" v-model="question_count" class="form-control col-sm-1">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"
+                            style="margin-left: 20px">
+                        ⚙详细设置
+                    </button>
+                </form>
+            </div>
+
+            <!--grade选择-->
+            <div class="row" style="padding-top: 0px;margin-top: 0px">
+                <form class="input-group" style="padding-left: 15px;padding-bottom: 10px">
+                    <a style="padding-top: 10px;padding-left: 15px">年&nbsp&nbsp&nbsp级：&nbsp&nbsp&nbsp&nbsp</a>
+                    <div class="btn-group" data-toggle="buttons" style="width:60%;margin-top: 0px">
+                        <label :class="{  'btn-danger': grade==1, 'btn-default': !(grade==1)}" class="btn col-sm-2"
+                               @click="set_grade(1)">
+                            一年级 </label>
+                        <label :class="{  'btn-warning': grade==2, 'btn-default': !(grade==2)}" class="btn col-sm-2"
+                               @click="set_grade(2)">
+                            二年级 </label>
+                        <label :class="{  'btn-primary': grade==3, 'btn-default': !(grade==3)}" class="btn col-sm-2"
+                               @click="set_grade(3)">
+                            三年级 </label>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 立即生成-->
+            <div class="row" style="margin-left: 10px;margin-bottom: 10px">
+                <button class="btn btn-danger" style="font-weight:bold;cursor:hand" @click="display">
+                    立即生成！
+                </button>
+            </div>
+            <!-- 模态框 -->
+            <div class="modal fade" id="myModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- 模态框头部 -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">详细设置</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- 模态框主体 -->
+                        <div class="modal-body">
+                            <!--tablist符号设置-->
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li v-if="isadd " class="nav-item">
+                                            <a class="nav-link " href="#tab_add" role="tab" data-toggle="tab">
+                                                <!--                            <ion-icon name="add"></ion-icon>-->
+                                                ➕ 加法设置</a>
+                                        </li>
+                                        <li v-if="issub" class="nav-item">
+                                            <a class="nav-link " href="#tab_sub" role="tab" data-toggle="tab">
+                                                <!--                            <ion-icon name="remove"></ion-icon>-->
+                                                ➖ 减法设置</a>
+                                        </li>
+                                        <li v-if="ismul" class="nav-item">
+                                            <a class="nav-link " href="#tab_mul" role="tab" data-toggle="tab">
+                                                <!--                            <ion-icon name="mul"></ion-icon>-->
+                                                ✖ 乘法设置</a>
+                                        </li>
+                                        <li v-if="isdiv" class="nav-item">
+                                            <a class="nav-link " href="#tab_div" role="tab" data-toggle="tab">
+                                                <!--                            <ion-icon name="div"></ion-icon>-->
+                                                ➗ 除法设置</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!--tabcontent-->
+                            <div class="tab-content">
+                                <!-- tab_add-->
+                                <div class="container tab-pane fade" id="tab_add" v-if="isadd"
+                                     style="padding-top: 15px">
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#1范围：</span>
+                                        </div>
+                                        <input v-model="range_add_op[0].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_add_op[0].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#2范围：</span>
+                                        </div>
+                                        <input v-model="range_add_op[1].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_add_op[1].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10" v-if='item_count!=2'>
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#3范围：</span>
+                                        </div>
+                                        <input v-model="range_add_op[2].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_add_op[2].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">得数范围：</span>
+                                        </div>
+                                        <input v-model=" result_add.min" type="number" class="form-control" title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model=" result_add.max" type="number" class="form-control" title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">进位设置：</span>
+                                        </div>
+                                        <select v-model="carry" class="form-control">
+                                            <option value="random">随机决定是否生成带进位的加法题</option>
+                                            <option value="no">不要生成有进位的加法题</option>
+                                            <option value="all">总是生成带进位的加法题</option>
+                                        </select>
+                                    </form>
+                                </div>
+                                <!-- tab_sub-->
+                                <div class="container tab-pane fade" id="tab_sub" v-if="issub"
+                                     style="padding-top: 15px">
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#1范围：</span>
+                                        </div>
+                                        <input v-model="range_sub_op[0].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_sub_op[0].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#2范围：</span>
+                                        </div>
+                                        <input v-model="range_sub_op[1].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_sub_op[1].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10" v-if='item_count!=2'>
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#3范围：</span>
+                                        </div>
+                                        <input v-model="range_sub_op[2].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_sub_op[2].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">得数范围：</span>
+                                        </div>
+                                        <input v-model=" result_sub.min" type="number" class="form-control" title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model=" result_sub.max" type="number" class="form-control" title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">借位设置：</span>
+                                        </div>
+                                        <select name="borrow" v-model="borrow" class="form-control">
+                                            <option value="random" selected>随机决定是否生成带借位的减法题</option>
+                                            <option value="no">不要生成有借位的减法题</option>
+                                            <option value="all">总是生成带借位的减法题</option>
+                                        </select>
+                                    </form>
+                                </div>
+                                <!-- tab_mul-->
+                                <div class="container tab-pane fade" id="tab_mul" v-if="ismul"
+                                     style="padding-top: 15px">
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#1范围：</span>
+                                        </div>
+                                        <input v-model="range_mul_op[0].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_mul_op[0].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#2范围：</span>
+                                        </div>
+                                        <input v-model="range_mul_op[1].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_mul_op[1].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10" v-if='item_count!=2'>
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#3范围：</span>
+                                        </div>
+                                        <input v-model="range_mul_op[2].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_mul_op[2].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">得数范围：</span>
+                                        </div>
+                                        <input v-model="result_mul.min" type="number" class="form-control" title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="result_mul.max" type="number" class="form-control" title="最大值">
+                                    </form>
+                                </div>
+                                <!--tab_div-->
+                                <div class="container tab-pane fade" id="tab_div" v-if="isdiv"
+                                     style="padding-top: 15px">
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#1范围：</span>
+                                        </div>
+                                        <input v-model="range_div_op[0].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_div_op[0].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#2范围：</span>
+                                        </div>
+                                        <input v-model="range_div_op[1].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_div_op[1].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10" v-if='item_count!=2'>
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">运算项#3范围：</span>
+                                        </div>
+                                        <input v-model="range_div_op[2].min" type="number" class="form-control"
+                                               title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="range_div_op[2].max" type="number" class="form-control"
+                                               title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">得数范围：</span>
+                                        </div>
+                                        <input v-model="result_div.min" type="number" class="form-control" title="最小值">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">-</span>
+                                        </div>
+                                        <input v-model="result_div.max" type="number" class="form-control" title="最大值">
+                                    </form>
+                                    <form class="input-group mb-3 col-sm-10">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">整除余数设置：</span>
+                                        </div>
+                                        <select disabled name="nomod" v-model="nomod" class="form-control">
+                                            <option value="random">随机生成</option>
+                                            <option value="no">无余数（确保能除尽）</option>
+                                            <option value="all">总是有余数</option>
+                                        </select>
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <!-- 模态框底部 -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!--页面2 在线测试-->
+    <div class="container col-sm-7" v-cloak>
+        <!-- card   -->
+        <div v-if="temp_page==2&&question_num>=0" class="card bg-light" style="width: 100%;margin-top: 1%">
+            <span class="form-control" style="font-weight: bolder">{{question_num+1}}、(单选)&nbsp&nbsp{{Formula[question_num][0]}}&nbsp{{Formula[question_num][1]}}&nbsp{{Formula[question_num][2]}}&nbsp{{Formula[question_num][3]}}&nbsp{{Formula[question_num][4]}}&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
+            <button :class="{ active: user_choice==1, ' btn-primary': user_choice==1&&!sub_flag, 'btn-outline-default': user_choice!=1&&!sub_flag,'btn-success':sub_flag&&result_to_chose[question_num][0]===result[question_num] ,'btn-danger':sub_flag&& user_choice===1 &&true_false[question_num]===0 }"
+                    class="btn" @click="set_user_choice(1)" style="text-align: left">
+                A、&nbsp{{result_to_chose[question_num][0]}}
+            </button>
+            <!--            {{result_to_chose[question_num][0]}}-->
+            <button :class="{ active: user_choice==1, ' btn-primary': user_choice==2&&!sub_flag, 'btn-outline-default': user_choice!=2&&!sub_flag,'btn-success':sub_flag&& result_to_chose[question_num][1]===result[question_num] ,'btn-danger':sub_flag&& user_choice===2 &&true_false[question_num]===0 }"
+                    class="btn" @click="set_user_choice(2)" style="text-align: left">
+                B、&nbsp{{result_to_chose[question_num][1]}}
+            </button>
+            <button :class="{ active: user_choice==1, ' btn-primary': user_choice==3&&!sub_flag,  'btn-outline-default': user_choice!=3&&!sub_flag,'btn-success':sub_flag&&result_to_chose[question_num][2]===result[question_num] ,'btn-danger':sub_flag&& user_choice===3 &&true_false[question_num]===0 }"
+                    class="btn" @click="set_user_choice(3)" style="text-align: left">
+                C、&nbsp{{result_to_chose[question_num][2]}}
+            </button>
+            <button :class="{ active: user_choice==1, ' btn-primary': user_choice==4&&!sub_flag, 'btn-outline-default': user_choice!=4&&!sub_flag,'btn-success':sub_flag&& result_to_chose[question_num][3]===result[question_num],'btn-danger':sub_flag&& user_choice===4 &&true_false[question_num]===0 }"
+                    class="btn " @click="set_user_choice(4)" style="text-align: left">
+                D、&nbsp{{result_to_chose[question_num][3]}}
+            </button>
+            <div style="text-align: center"><a>({{question_num+1}}/{{question_count}})</a></div>
+            <div class="row col-sm-10" style="padding-bottom: 0px;margin-bottom: 0px;margin-top: 0px">
+                <button :disabled="question_num==0" class="btn btn-outline-success" @click="pre_question"
+                        style="text-align: center;width: 18%;margin-left:10%">
+                    上一题
+                </button>
+                <button v-if="question_num<question_count-1" class="btn btn-outline-danger" @click="next_question"
+                        style="text-align: center;width:  18%;right: 10px;margin-left:52%">
+                    下一题
+                </button>
+                <button :disabled="sub_flag" v-if="question_num==question_count-1" class="btn btn-outline-danger"
+                        @click="compare"
+                        style="text-align: center;width:  18%;right: 10px;margin-left:52%">
+                    提交
+                </button>
+            </div>
+            <div class="row col-sm-10" style="padding-bottom: 0px;margin-bottom: 0px;margin-top: 10px">
+                <button v-if="sub_flag==true" class="btn btn-success" @click="wrong_analyze"
+                        style="text-align: center;width: 30%;margin-left:10%">
+                    错题分析
+                </button>
+            </div>
+        </div>
+
+        <div v-if="temp_page==2&&question_num== -1" class="card bg-light" style="width: 100%;margin-top: 1%">
+            <span style="margin:30px">请点击下面的按钮生成试题！</span>
+            <!-- 立即生成-->
+            <div class="row" style="margin-left: 10px;margin-bottom: 10px;margin-left: 30px">
+                <button class="btn btn-danger" style="font-weight:bold;cursor:hand" @click="display">
+                    立即生成！
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--    页面3 试题页面-->
+    <div class="container col-sm-10" v-cloak>
+        <!-- card   -->
+        <div v-if="temp_page==3" class="card bg-light" style="width: 100%;margin-top: 1%">
+            <div class="print-repeat" style="text-align:center">
+                <h3>小学生口算题</h3>
+                姓名：__________ 日期：____月____日 时间：________ 对题：____道<br/><br/>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div v-for="item in Formula" class="col-sm-4"
+                         style="font-family: 宋体;font-size: 20px;height: 50px;text-align:center;">
+                        &nbsp{{item[0]}}{{item[1]}}{{item[2]}}{{item[3]}}{{item[4]}}&nbsp
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--    页面4 错误分析页面-->
+
+    <div class="container col-sm-10" v-cloak>
+        <!-- card   -->
+        <div v-show="temp_page==4" class="card bg-light" style="width:500px;margin-top: 1%;height: 400px">
+            <div id="wrong" style="height:400px; margin-top: 2%;width: 500px" class="col-sm-10"></div>
+        </div>
+    </div>
+
+    `
+</div>
+
+<script type="text/javascript">
+
+</script>
+
+</body>
+
+<script>
+    var APP = new Vue({
+        el: '#APP',
+        data: {
+            temp_page: 1,//当前页面数1.setting; 2,试题页面; 3,在线测试页面，4,错误分析页面
+            sub_flag: false,//提交标志
+            true_false: [],//用户结果的正确与否
+            user_question_type: [],//记录每道题目的类型1，2，3，4为不进位加减乘除，5，6为进位/借位加减
+            user_wrong_analyze: {
+                add_wrong: 0,
+                sub_wrong: 0,
+                mul_wrong: 0,
+                div_wrong: 0,
+                borrow_wrong: 0,
+                carry_wrong: 0,
+            },//记录出错情况
+
+            report: {
+                addnum: 0, // 加法题数目
+                subnum: 0, // 减法题数目
+                mulnum: 0, //乘法题数目
+                divnum: 0, //除法题数目
+                borrownum: 0, // 借位题数量
+                carrynum: 0, // 进位题数量
+            },
+
+            Formula: [],//生成的算式
+            result: [],//算式的正确结果
+            result_to_chose: [],//待选结果
+            blank_position: [],//空白位置1,2,3判断对错时候用
+            question_count: 30,//生成题目数目
+            item_count: 2,//运算项个数
+            question_num: -1,//当前题目序号
+            user_choice: 0,//在线测试里用户的选项
+            user_choice_saved: [],//存储用户的结果
+            compute_dest: "random",//运算目标random(随机);result(结果);op(运算项)
+            grade: 1,//年级数，默认为一年级
+
+
+            borrow: 'random', // 减法借位设置random/no/all
+            carry: 'random', // 加法进位设置random/no/all
+            nomod: 'no', // 除法余数设置andom/no/all
+
+            isadd: true,//包含加法
+            issub: true,//包含减法
+            ismul: true,//包含乘法
+            isdiv: true,//包含除法
+
+
+// 加法
+            range_add_op: [{min: 0, max: 100}, {min: 0, max: 100}, {min: 0, max: 100}],
+            result_add: {min: 0, max: 200},
+            range_add: [],
+// 减法
+            range_sub_op: [{min: 0, max: 200}, {min: 0, max: 100}, {min: 0, max: 100}],
+            result_sub: {min: 0, max: 100},
+            range_sub: [],
+
+// 乘法
+            range_mul_op: [{min: 0, max: 20}, {min: 5, max: 20}],
+            result_mul: {min: 4, max: 400},
+            range_mul: [],
+
+// 除法
+            range_div_op: [{min: 0, max: 81}, {min: 1, max: 9}, {min: 1, max: 9}],
+            result_div: {min: 2, max: 9},
+            range_div: [],
+
+//错误分析图
+            option: {
+                title: {
+                    text: '错题分析',
+                    x: 'center',
+                    y: 'top',
+                    textStyle: {
+                        //color: 'pink',        //颜色
+                        fontStyle: 'normal',     //风格
+                        fontWeight: 'normal',    //粗细
+                        fontFamily: '宋体',   //字体
+                        fontSize: 20,     //大小
+                        align: 'center'   //水平对齐
+                    }
+                },
+
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'line',        // 默认为直线，可选为：'line' | 'shadow'
+                        lineStyle: {          // 直线指示器样式设置
+                            color: '#48b',
+                            width: 2,
+                            type: 'solid'
+                        }
+                    }
+                },
+                legend: {
+                    x: 'right',
+                    data: ['错误', '正确']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisTick: {
+                        // show:false,
+                        inside: true,
+                        length: 1
+                    },
+                    splitLine: {
+                        show: false
+                        //  改变轴线颜色
+                        // lineStyle: {
+                        //     // 使用深浅的间隔色
+                        //     color: ['red']
+                        // }
+                    },
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['借位 ', '进位 ', '除法 ', '乘法 ', '减法 ', '加法 '],
+                    axisLabel: {
+                        show: true,
+                        textStyle: {
+                            // color: '#fff',
+                            fontSize: '15'
+                        }
+                    },
+                    axisTick: {
+                        show: false,
+                        // inside:true,
+                        // length:1
+                    },
+                },
+                series: [
+                    {
+                        name: '错误',
+                        type: 'bar',
+                        stack: '总量',
+                        itemStyle: {
+                            normal: {
+                                color: 'red',
+                            }
+                        },
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'insideRight'
+                            }
+                        },
+                        data: [1, 2, 3, 4, 5, 6]
+                        // data: [this.user_wrong_analyze.add_wrong, this.user_wrong_analyze.borrow_wrong,this.user_wrong_analyze.carry_wrong, this.user_wrong_analyze.div_wrong, this.user_wrong_analyze.mul_wrong, this.user_wrong_analyze.sub_wrong, this.user_wrong_analyze.add_wrong]
+                    },
+                    {
+                        name: '正确',
+                        type: 'bar',
+                        stack: '总量',
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'insideRight'
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: 'green',
+                                barBorderRadius: [0, 10, 10, 0]
+
+                            }
+                        },
+                        barWidth: '25',				//---柱形宽度
+                        data: [1, 2, 3, 4, 5, 6]
+
+                        // data: [this.report.borrownum - this.user_wrong_analyze.borrow_wrong,  this.report.carrynum -this.user_wrong_analyze.carry_wrong,   this.report.divnum - this.user_wrong_analyze.div_wrong,   this.report.mulnum - this.user_wrong_analyze.mul_wrong,   this.report.subnum -this.user_wrong_analyze.sub_wrong  ,this.report.addnum -this.user_wrong_analyze.add_wrong]
+                    }
+                ]
+            }
+
+        },
+
+        methods: {
+            op_range: function () {
+                var ops = [];
+                if (this.isadd) ops.push('+');
+                if (this.issub) ops.push('-');
+                if (this.ismul) ops.push('*');
+                if (this.isdiv) ops.push('/');
+                if (ops.length < 1) return '+';
+                if (ops.length === 1) return ops[0];
+                var rnd = parseInt(Math.random() * 1000) % ops.length;
+                return ops[rnd];
+            },
+
+            isValid: function () {
+                if (!(this.isadd || this.issub || this.ismul || this.isdiv)) {
+                    alert('必须至少指定一种运算符！');
+                    return false;
+                }
+                if (this.result_add.max - 0 < this.result_add.min - 0) {
+                    alert('加法得数范围无效！');
+                    return false;
+                }
+                if (this.result_sub.max - 0 < this.result_sub.min - 0) {
+                    alert('减法得数范围无效！');
+                    return false;
+                }
+                if (this.result_mul.max - 0 < this.result_mul.min - 0) {
+                    alert('乘法得数范围无效！');
+                    return false;
+                }
+                if (this.result_div.max - 0 < this.result_div.min - 0) {
+                    alert('除法得数范围无效！');
+                    return false;
+                }
+                for (var i = 0; i < this.itemcount; i++) {
+                    if (i > 1) break; // 目前算法已经修改：只需要左|右两个运算项范围就行了，多了无用！
+                    if (this.range_add[i].max - 0 < this.range_add[i].min - 0) {
+                        alert('加法数值' + (i + 1) + '范围无效！');
+                        return false;
+                    }
+                    if (this.range_sub[i].max - 0 < this.range_sub[i].min - 0) {
+                        alert('减法数值' + (i + 1) + '范围无效！');
+                        return false;
+                    }
+                    if (this.range_mul[i].max - 0 < this.range_mul[i].min - 0) {
+                        alert('乘法数值' + (i + 1) + '范围无效！');
+                        return false;
+                    }
+                    if (this.range_div[i].max - 0 < this.range_div[i].min - 0) {
+                        alert('除法数值' + (i + 1) + '范围无效！');
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            randomInt: function (min, max, bitnotinarry, bitinarry, notinarry) {
+                //bitnotinarry 不能生成的个位数字列表
+                //bitarry 可以生成的各位数字列表
+                //notinarry 不能生成的数值列表
+                if ("undefined" == typeof (bitnotinarry))
+                    bitnotinarry = [];
+                if ("undefined" == typeof (bitinarry))
+                    bitinarry = [];
+                if ("undefined" == typeof (notinarry))
+                    notinarry = [];
+                min = parseInt(min);
+                max = parseInt(max);
+                if (max < min) {
+                    console.log("错误：无效的范围 min =", Min, ", max =", Max);
+                    max = min; // 保证范围有效！r                                               r
+                }
+                var Range = max - min;
+                var Rand = Math.random();
+                var num = min + Math.round(Rand * Range);
+                var i, pos;
+                var single_bit = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];//记录个位数字的包含项
+                if (max - min + 1 < 10) { // 范围不足10时，不需要用到个位数列表
+                    for (single_bit = [], i = min; i <= max; i++) {
+                        single_bit.push(i % 10);
+                    }
+                }
+                for (i = 0; i < bitnotinarry.length; i++) { // 移除必须不含的个位
+                    pos = single_bit.indexOf(bitnotinarry[i]);
+                    if (pos >= 0) single_bit.splice(pos, 1);
+                }
+                // console.log("single_bit:",single_bit);
+
+                for (i = 0; bitinarry.length > 0 && i < single_bit.length; i++) { // 移除未出现在此数组中的个位数
+                    pos = bitinarry.indexOf(single_bit[i]);
+                    if (pos === -1) {
+                        single_bit.splice(i, 1);
+                        i--;
+                    }
+                }
+                //  console.log("single_bit in f",single_bit);
+
+                if (single_bit.length <= 0) { // 范围内没有整数可以满足对个位数的要求？
+                    num = min + Math.round(Math.random() * (max - min));
+                    console.log('    错误：范围 ' + min + '~' + max + ' 中无法满足个位要求。');
+                } else {
+                    //先随机几次尝试
+                    for (i = 0; i < 10; i++) {
+                        num = min + Math.round(Math.random() * (max - min));
+                        if (!(single_bit.indexOf(num % 10) < 0 || (notinarry.length > 0 && notinarry.indexOf(num) >= 0))) {
+                            break;
+                        }
+                    }
+                    // 仍未命中,遍历：
+                    if (single_bit.indexOf(num % 10) < 0 || (notinarry.length > 0 && notinarry.indexOf(num) >= 0)) {
+                        var tmparry = [];
+                        // 找到所有可能的有效值列表
+                        for (num = min; num <= max; num++) {
+                            if (single_bit.indexOf(num % 10) < 0 || (notinarry.length > 0 && notinarry.indexOf(num) >= 0)) {
+                                continue; // 不符合
+                            }
+                            tmparry.push(num);
+                        }
+                        if (tmparry.length <= 0) {
+                            num = min + Math.round(Math.random() * (max - min));
+                            console.log('    错误：未能生成范围(' + min + '~' + max + ')内的数值！',
+                                '个位不含(' + bitnotinarry.join(',') + ')', '个位必含(' + bitinarry.join(',') + ')',
+                                '不含(' + bitnotinarry.join(',') + ')', '必含(' + bitinarry.join(',') + ')');
+                        } else {
+                            pos = Math.round(Math.random() * (tmparry.length - 1));
+                            num = tmparry[pos];
+                        }
+                    }
+                }
+                //console.log("num:", num);
+                return num;
+            },
+
+            getitem: function () {
+                var op = this.op_range();//随机选择运算符中的一种
+                //console.log(op);
+                var range = ({
+                    '+': this.range_add_op,
+                    '-': this.range_sub_op,
+                    '*': this.range_mul_op,
+                    '/': this.range_div_op
+                })[op];
+                var result = ({
+                    '+': this.result_add,
+                    '-': this.result_sub,
+                    '*': this.result_mul,
+                    '/': this.result_div
+                })[op];
+                var range1, rang2, rang3;
+                var limit = [];//限制数字生成时的规则
+                var min1 = range[0].min, max1 = range[0].max, min2 = range[1].min, max2 = range[1].max;
+                //console.log(min1, min2,max1,max2);
+                var minr = result.min, maxr = result.max;
+                var min_bit, max_bit;
+                var arr1, arr2, arr3;
+                var operand1, operand2, operand3;
+                var item = [];
+                //加法生成
+                if (op === '+') {
+                    //运算项1
+                    if (this.carry === "all")
+                        limit = [0];//加法进位时个位不为0
+                    operand1 = this.randomInt(min1, max1, limit);
+                    //console.log("operand1:", operand1);
+                    var bit_1 = operand1 % 10, single_bit_2 = [];
+                    min_bit = 0;
+                    max_bit = 9;
+                    if (this.carry === "all") {
+                        min_bit = 10 - bit_1;
+                    } else if (this.carry === "no") {
+                        max_bit = 9 - bit_1
+                    }
+                    //console.log("this.carry:", this.carry);
+                    //console.log("max_bit:", max_bit, " min_bit:", min_bit);
+                    for (var j = min_bit; j <= max_bit; j++) {
+                        single_bit_2.push(j);
+                    }
+                    //运算项2
+                    //console.log(Math.max(min2, minr - operand1), Math.min(max2, maxr - operand1))
+                    //console.log("single_bit_2:",single_bit_2);
+                    operand2 = this.randomInt(Math.max(min2, minr - operand1), Math.min(max2, maxr - operand1), undefined, single_bit_2);
+                    //console.log("operand2:", operand2);
+
+                    if (this.compute_dest === "result") {
+                        item.push(operand1);
+                        item.push('+');
+                        item.push(operand2);
+                        item.push('=');
+                        item.push("____");
+                        this.result.push(parseInt(operand1 + operand2));
+                        this.blank_position.push("result");
+                        this.Formula.push(item);
+                    } else if (this.compute_dest === "op") {
+                        var num = Math.random() * 2;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('+');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(parseInt(operand1 + operand2));
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('+');
+                            item.push("____");
+                            item.push('=');
+                            item.push(parseInt(operand1 + operand2));
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        }
+                    } else {
+                        var num = Math.random() * 3;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('+');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(parseInt(operand1 + operand2));
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                        } else if (num < 2) {
+                            item.push(operand1);
+                            item.push('+');
+                            item.push("____");
+                            item.push('=');
+                            item.push(parseInt(operand1 + operand2));
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('+');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push("____");
+                            this.result.push(parseInt(operand1 + operand2));
+                            this.blank_position.push("result");
+                            this.Formula.push(item);
+                        }
+                    }
+                } else if (op === "-") {
+                    //运算项1
+                    if (this.borrow === "all") {
+                        limit = [9];//减法借位时个位不为9
+                        operand1 = this.randomInt(Math.max(min1, min2 + 10), max1, limit);
+                    } else
+                        operand1 = this.randomInt(Math.max(min1, min2), max1, limit);
+                    //console.log("operand1:", operand1);
+                    var bit_1 = operand1 % 10, single_bit_2 = [];
+
+                    min_bit = 0;
+                    max_bit = 9;
+                    if (this.borrow === "all") {
+                        min_bit = bit_1 + 1;
+                    } else if (this.borrow === "no") {
+                        max_bit = bit_1
+                    }
+                    //console.log("this.carry:", this.carry);
+                    //console.log("max_bit:", max_bit, " min_bit:", min_bit);
+                    for (var j = min_bit; j <= max_bit; j++) {
+                        single_bit_2.push(j);
+                    }
+                    //运算项2
+                    //console.log(Math.max(min2, minr - operand1), Math.min(max2, maxr - operand1))
+                    //console.log("single_bit_2:",single_bit_2);
+                    operand2 = this.randomInt(Math.max(min2, operand1 - max1), Math.min(max2, operand1 - minr), undefined, single_bit_2);
+                    //console.log("operand2:", operand2);
+
+                    if (this.compute_dest === "result") {
+                        item.push(operand1);
+                        item.push('-');
+                        item.push(operand2);
+                        item.push('=');
+                        item.push("____");
+                        this.result.push(operand1 - operand2);
+                        this.blank_position.push("result");
+                        this.Formula.push(item);
+                    } else if (this.compute_dest === "op") {
+                        var num = Math.random() * 2;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('-');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(operand1 - operand2);
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('-');
+                            item.push("____");
+                            item.push('=');
+                            item.push(operand1 - operand2);
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        }
+
+                    } else {
+                        var num = Math.random() * 3;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('-');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(operand1 - operand2);
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                        } else if (num < 2) {
+                            item.push(operand1);
+                            item.push('-');
+                            item.push("____");
+                            item.push('=');
+                            item.push(operand1 - operand2);
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('-');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push("____");
+                            this.result.push(operand1 - operand2);
+                            this.blank_position.push("result");
+                            this.Formula.push(item);
+                        }
+                    }
+                } else if (op === "*") {
+                    operand1 = this.randomInt(min1, max1, limit);
+                    //console.log("operand1:", operand1);
+                    if (operand1 !== 0)
+                        operand2 = this.randomInt(Math.max(min2, minr / operand1), Math.min(max2, maxr / operand1));
+                    else
+                        operand2 = this.randomInt(min2, max2);
+                    //console.log("operand2:", operand2);
+                    if (this.compute_dest === "result") {
+                        item.push(operand1);
+                        item.push('x');
+                        item.push(operand2);
+                        item.push('=');
+                        item.push("____");
+                        this.result.push(operand1 * operand2);
+                        this.blank_position.push("result");
+                        this.Formula.push(item);
+                    } else if (this.compute_dest === "op") {
+                        var num = Math.random() * 2;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('x');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(operand1 * operand2);
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('x');
+                            item.push("____");
+                            item.push('=');
+                            item.push(operand1 * operand2);
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        }
+                    } else {
+                        var num = Math.random() * 3;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('x');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(operand1 * operand2);
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                        } else if (num < 2) {
+                            item.push(operand1);
+                            item.push('x');
+                            item.push("____");
+                            item.push('=');
+                            item.push(operand1 * operand2);
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('x');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push("____");
+                            this.result.push(operand1 * operand2);
+                            this.blank_position.push("result");
+                            this.Formula.push(item);
+                        }
+                    }
+
+                } else if (op === "/") {
+                    operand1 = this.randomInt(min1, max1);
+                    operand2 = this.randomInt(Math.max(operand1 / maxr, min2), Math.max(operand1 / minr, max2, operand1), undefined, undefined, [0]);
+                    while (operand1 % operand2 !== 0) {
+                        // console.log("operand2:", operand2);
+                        operand2 = this.randomInt(Math.max(operand1 / maxr, min2), Math.max(operand1 / minr, max2, operand1), undefined, undefined, [0]);
+                    }
+                    if (this.compute_dest === "result") {
+                        item.push(operand1);
+                        item.push('÷');
+                        item.push(operand2);
+                        item.push('=');
+                        item.push("____");
+                        this.result.push(operand1 / operand2);
+                        this.blank_position.push("result");
+                        this.Formula.push(item);
+                    } else if (this.compute_dest === "op") {
+                        var num = Math.random() * 2;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('÷');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(operand1 / operand2);
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('÷');
+                            item.push("____");
+                            item.push('=');
+                            item.push(operand1 / operand2);
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        }
+                    } else {
+                        var num = Math.random() * 3;
+                        if (num < 1) {
+                            item.push("____");
+                            item.push('÷');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push(operand1 / operand2);
+                            this.result.push(operand1);
+                            this.blank_position.push("op1");
+                            this.Formula.push(item);
+                        } else if (num < 2) {
+                            item.push(operand1);
+                            item.push('÷');
+                            item.push("____");
+                            item.push('=');
+                            item.push(operand1 / operand2);
+                            this.result.push(operand2);
+                            this.blank_position.push("op2");
+                            this.Formula.push(item);
+                        } else {
+                            item.push(operand1);
+                            item.push('÷');
+                            item.push(operand2);
+                            item.push('=');
+                            item.push("____");
+                            this.result.push(operand1 / operand2);
+                            this.blank_position.push("result");
+                            this.Formula.push(item);
+                        }
+                    }
+
+                }
+
+                if (op === "+") {
+                    if (this.carry === 'no')
+                        this.user_question_type.push(1);
+                    else if (this.carry === 'all')
+                        this.user_question_type.push(5);
+                    else {
+                        var temp1 = operand1 % 10;
+                        var temp2 = operand2 % 10;
+                        if (parseInt(temp1 + temp2) >= 10)
+                            this.user_question_type.push(5);
+                        else
+                            this.user_question_type.push(1);
+                    }
+                } else if (op === '-') {
+                    if (this.borrow === 'no')
+                        this.user_question_type.push(2);
+                    else if (this.borrow === 'all')
+                        this.user_question_type.push(6);
+                    else {
+                        var temp1 = operand1 % 10;
+                        var temp2 = operand2 % 10;
+                        if (temp1 < temp2)
+                            this.user_question_type.push(6);
+                        else
+                            this.user_question_type.push(2);
+                    }
+                } else if (op === '*')
+                    this.user_question_type.push(3);
+                else if (op === '/')
+                    this.user_question_type.push(4);
+            },
+
+            display: function () {
+                this.re_set();
+                //console.log(this.question_num);
+                for (var i = 0; i < this.question_count; i++) {
+                    this.getitem();
+                }
+                this.get_result_to_chose();
+            },
+
+            re_set: function () {
+                this.sub_flag = false;
+                this.user_choice_saved = [];
+                this.result_to_chose = [];
+                this.user_question_type = [];
+                this.temp_page = 2;
+                this.question_num = 0;
+                this.result = [];
+                this.true_false = [];//用户结果的正确与否
+                this.Formula = [];//生成的算式
+                this.result = [];//算式的正确结果
+                this.blank_position = [];//空白位置1,2,3判断对错时候用
+                this.user_wrong_analyze = {
+                    add_wrong: 0,
+                    sub_wrong: 0,
+                    mul_wrong: 0,
+                    div_wrong: 0,
+                    borrow_wrong: 0,
+                    carry_wrong: 0,
+                }
+                this.report = {
+                    addnum: 0, // 加法题数目
+                    subnum: 0, // 减法题数目
+                    mulnum: 0, //乘法题数目
+                    divnum: 0, //除法题数目
+                    borrownum: 0, // 借位题数量
+                    carrynum: 0, // 进位题数量
+                }
+            },
+
+            set_grade: function (grade) {
+                if (grade === 1) {
+                    this.grade = 1;
+                    this.question_count = 30;
+                    this.compute_dest = 'result';
+                    this.borrow = 'no';
+                    this.carry = 'no';
+                    this.nomod = 'no';
+                    this.isadd = true;
+                    this.issub = true;
+                    this.ismul = false;
+                    this.isdiv = false;
+// 加法
+                    this.range_add_op = [{min: 0, max: 20}, {min: 0, max: 20}, {min: 0, max: 20}];
+                    this.result_add = {min: 0, max: 40};
+// 减法
+                    this.range_sub_op = [{min: 0, max: 200}, {min: 0, max: 100}, {min: 0, max: 100}];
+                    this.result_sub = {min: 0, max: 100};
+// 乘法
+                    this.range_mul_op = [{min: 0, max: 20}, {min: 5, max: 20}];
+                    this.result_mul = {min: 4, max: 400};
+// 除法
+                    this.range_div_op = [{min: 0, max: 81}, {min: 1, max: 9}, {min: 1, max: 9}];
+                    this.result_div = {min: 2, max: 9};
+                }
+                if (grade === 2) {
+                    this.grade = 2;
+                    this.compute_dest = 'result';
+                    this.question_count = 36;
+                    this.borrow = 'no';
+                    this.carry = 'random';
+                    this.nomod = 'no';
+                    this.isadd = true;
+                    this.issub = true;
+                    this.ismul = true;
+                    this.isdiv = false;
+// 加法
+                    this.range_add_op = [{min: 0, max: 50}, {min: 0, max: 50}, {min: 0, max: 50}];
+                    this.result_add = {min: 0, max: 100};
+// 减法
+                    this.range_sub_op = [{min: 0, max: 100}, {min: 0, max: 50}, {min: 0, max: 50}];
+                    this.result_sub = {min: 0, max: 50};
+// 乘法
+                    this.range_mul_op = [{min: 0, max: 15}, {min: 1, max: 20}];
+                    this.result_mul = {min: 2, max: 100};
+// 除法
+                    this.range_div_op = [{min: 0, max: 81}, {min: 1, max: 9}, {min: 1, max: 9}];
+                    this.result_div = {min: 2, max: 9};
+                }
+                if (grade === 3) {
+                    this.grade = 3;
+                    this.question_count = 44;
+                    this.compute_dest = 'random';
+                    this.borrow = 'random';
+                    this.carry = 'all';
+                    this.nomod = 'no';
+                    this.isadd = true;
+                    this.issub = true;
+                    this.ismul = true;
+                    this.isdiv = true;
+// 加法
+                    this.range_add_op = [{min: 0, max: 100}, {min: 0, max: 100}, {min: 0, max: 100}];
+                    this.result_add = {min: 0, max: 200};
+// 减法
+                    this.range_sub_op = [{min: 0, max: 200}, {min: 0, max: 100}, {min: 0, max: 100}];
+                    this.result_sub = {min: 0, max: 100};
+// 乘法
+                    this.range_mul_op = [{min: 0, max: 30}, {min: 5, max: 30}];
+                    this.result_mul = {min: 4, max: 400};
+// 除法
+                    this.range_div_op = [{min: 0, max: 81}, {min: 1, max: 9}, {min: 1, max: 9}];
+                    this.result_div = {min: 2, max: 9};
+                }
+            },
+
+            doPrint: function () {
+                this.temp_page = 3;
+                setTimeout(" window.print();", 1000); //延时执行
+            },
+
+            pre_question: function () {
+                if (this.question_num === 0)
+                    alert("当前为第一题")
+                else {
+                    this.question_num--;
+                    this.user_choice = 0;
+                }
+                // console.log("this.user_choice_saved.length",this.user_choice_saved.length);
+                // console.log("this.question_num",this.question_num);
+
+                if (this.user_choice_saved.length > this.question_num) {
+                    this.user_choice = this.user_choice_saved[this.question_num];
+                    //console.log(this.user_choice);
+                }
+            },
+
+            next_question: function () {
+                if (this.question_num + 1 < this.question_count) {
+                    this.question_num++;
+                    this.user_choice = 0;
+                } else
+                    alert("已到最后一题")
+                if (this.user_choice_saved.length > this.question_num) {
+                    this.user_choice = this.user_choice_saved[this.question_num];
+                    //console.log(this.user_choice);
+                }
+            },
+
+            set_user_choice: function (num) {
+                this.user_choice = num;
+                //console.log("this.user_choice_saved.length",this.user_choice_saved.length);
+                //console.log("this.question_num",this.question_num);
+                // if(this.user_choice.length===this.question_num)
+                //     this.user_choice_saved.push(num);
+                // else
+                this.user_choice_saved[this.question_num] = num;
+                //console.log(this.user_choice_saved);
+                //console.log(this.result);
+
+            },
+
+            get_result_to_chose: function () {
+                var temp;
+                var temp1 = [];
+                var temp2;
+                for (var j = 0; j < this.question_count; j++) {
+                    temp = Math.round(Math.random() * 3);
+                    //console.log(temp);
+                    for (var i = 0; i < 4; i++) {
+                        if (i === temp) {
+                            //console.log("push right");
+                            temp1.push(this.result[j]);
+                        } else {
+                            //console.log("push wrong");
+                            temp2 = this.randomInt(Math.max(this.result[j] - 10, 0), this.result[j] + 10, undefined, undefined, [this.result[j]]);
+                            temp1.push(temp2);
+                        }
+                    }
+                    this.result_to_chose.push(temp1);
+                    temp1 = [];
+                }
+                console.log(this.report);
+            },
+
+            compare: function () {
+                var ret = this.examine();
+                //console.log(ret);
+                if (ret === 0) {
+                    for (var i = 0; i < this.question_count; i++) {
+                        // console.log(this.result[i]);
+                        // console.log(this.result_to_chose[i]);
+                        // console.log(this.result[i] === this.result_to_chose[i][this.user_choice_saved[i]-1]);
+                        if (this.result[i] === this.result_to_chose[i][this.user_choice_saved[i] - 1])
+                            this.true_false.push(1);
+                        else
+                            this.true_false.push(0);
+
+                        var temp = this.user_question_type[i];
+
+                        if (this.true_false[i] === 0) {
+                            if (temp === 1)
+                                this.user_wrong_analyze.add_wrong += 1;
+                            else if (temp === 2)
+                                this.user_wrong_analyze.sub_wrong += 1;
+                            else if (temp === 3)
+                                this.user_wrong_analyze.mul_wrong += 1;
+                            else if (temp === 4)
+                                this.user_wrong_analyze.div_wrong += 1;
+                            else if (temp === 5) {
+                                this.user_wrong_analyze.add_wrong += 1;
+                                this.user_wrong_analyze.carry_wrong += 1;
+                            } else if (temp === 6) {
+                                this.user_wrong_analyze.sub_wrong += 1;
+                                this.user_wrong_analyze.borrow_wrong += 1;
+                            }
+                        }
+
+                        if (temp === 1)
+                            this.report.addnum += 1;
+                        else if (temp === 2)
+                            this.report.subnum += 1;
+                        else if (temp === 3)
+                            this.report.mulnum += 1;
+                        else if (temp === 4)
+                            this.report.divnum += 1;
+                        else if (temp === 5) {
+                            this.report.addnum += 1;
+                            this.report.carrynum += 1;
+                        } else if (temp === 6) {
+                            this.report.subnum += 1;
+                            this.report.borrownum += 1;
+                        }
+
+                    }
+                    this.sub_flag = true;
+                    // console.log("true_false:",this.true_false);
+                    // console.log("user_question_type",this.user_question_type);
+                    // console.log("user_wrong_analyze:",this.user_wrong_analyze);
+                    // console.log("report:",this.report);
+                }
+            },
+
+            examine: function () {//检查是否还有题目未作答
+                var i = 0;
+                for (; i < this.question_count; i++) {
+                    if (this.user_choice_saved[i] === undefined) {
+                        alert("题目未答完");
+                        return -1;
+                    }
+                }
+                return 0;
+            },
+
+            wrong_analyze: function () {
+                if (this.sub_flag === false) {
+                    alert("请先完成在线测测试！");
+                    if (this.question_num === -1)
+                        this.display();
+                    else
+                        this.temp_page = 2;
+                    return;
+                }
+                this.temp_page = 4;
+                var dom = document.getElementById("wrong");
+                var myChart = echarts.init(dom);
+                var app = {};
+                app.title = '堆叠条形图';
+                this.option.series[0].data = [this.user_wrong_analyze.add_wrong, this.user_wrong_analyze.borrow_wrong, this.user_wrong_analyze.carry_wrong, this.user_wrong_analyze.div_wrong, this.user_wrong_analyze.mul_wrong, this.user_wrong_analyze.sub_wrong, this.user_wrong_analyze.add_wrong]
+                this.option.series[1].data = [this.report.borrownum - this.user_wrong_analyze.borrow_wrong, this.report.carrynum - this.user_wrong_analyze.carry_wrong, this.report.divnum - this.user_wrong_analyze.div_wrong, this.report.mulnum - this.user_wrong_analyze.mul_wrong, this.report.subnum - this.user_wrong_analyze.sub_wrong, this.report.addnum - this.user_wrong_analyze.add_wrong]
+                if (this.option && typeof (this.option) === "object") {
+                    //console.log("输出啦");
+                    myChart.setOption(this.option, true);
+                }
+            },
+            sleep: function (d) {
+                for (var t = Date.now(); Date.now() - t <= d;) ;
+            }
+        },
+
+        computed: {},
+        created: {},
+        watch: {},
+    })
+</script>
+</html>

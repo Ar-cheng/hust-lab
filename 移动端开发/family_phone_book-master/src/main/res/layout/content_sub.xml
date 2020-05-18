@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:barrierAllowsGoneWidgets="false"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".SubActivity"
+    tools:showIn="@layout/activity_sub">
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="159dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="152dp"
+        android:layout_marginTop="48dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/phonenumber_s"
+        android:layout_width="174dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="168dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="175dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="20dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phonenumber_s" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="213dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/phonenumber"
+        android:layout_width="97dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date" />
+
+    <TextView
+        android:id="@+id/state"
+        android:layout_width="wrap_content"
+        android:layout_height="33dp"
+        android:layout_marginTop="256dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center_vertical"
+        android:text="TextView"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_call" />
+
+    <ImageButton
+        android:id="@+id/button_call"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="180dp"
+        android:layout_marginEnd="4dp"
+        android:background="#00FF0000"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toStartOf="@+id/button_message"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/call" />
+
+    <ImageButton
+        android:id="@+id/button_message"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="180dp"
+        android:layout_marginEnd="28dp"
+        android:background="#00FF0000"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/message" />
+
+    <ImageView
+        android:id="@+id/weather_type_icon"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="296dp"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/weather_temper"
+        android:layout_width="136dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weather_type_icon"
+        app:layout_constraintTop_toBottomOf="@+id/weather_type_notice" />
+
+    <TextView
+        android:id="@+id/weather_city"
+        android:layout_width="98dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="292dp"
+        app:layout_constraintStart_toEndOf="@+id/weather_type_icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/weather_type"
+        android:layout_width="57dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center|center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weather_type_icon" />
+
+    <TextView
+        android:id="@+id/weather_date"
+        android:layout_width="145dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weather_type_icon"
+        app:layout_constraintTop_toBottomOf="@+id/weather_city" />
+
+    <TextView
+        android:id="@+id/weather_type_notice"
+        android:layout_width="250dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toEndOf="@+id/weather_type_icon"
+        app:layout_constraintTop_toBottomOf="@+id/weather_date" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="89dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="204dp"
+        android:text="最近通话"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/address" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="44dp"
+        android:src="@drawable/iconfont_people"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonLocal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="4dp"
+        android:text="相册选取"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/info" />
+
+    <Button
+        android:id="@+id/buttonCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="4dp"
+        android:text="拍照选取"
+        app:layout_constraintStart_toEndOf="@+id/buttonLocal"
+        app:layout_constraintTop_toBottomOf="@+id/info" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
