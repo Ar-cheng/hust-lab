@@ -1,0 +1,8 @@
+在mini-c的基础上扩展的内容包括：
+char string
+for break continue
+多维数组
+struct
+++ --
++= -= *= /=
+单行注释 多行注释
