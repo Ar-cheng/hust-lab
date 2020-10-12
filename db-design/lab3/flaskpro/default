@@ -1,0 +1,16 @@
+server {
+	listen 80;
+    server_name _ ;
+    charset utf-8;
+    client_max_body_size 75M;
+    location / { 
+ 
+        include uwsgi_params;                       # 导入uwsgi配置
+        uwsgi_pass 127.0.0.1:5555;                  # 转发端口，需要和uwsgi配置当中的监听端口一致
+        #uwsgi_param UWSGI_PYTHON /var/www/flask/flaskapp/bin/python;  # Python解释器所在的路径，如果有虚拟环境可将路径设置为虚拟环境
+        #uwsgi_param UWSGI_CHDIR /var/www/flask;     # 项目根目录
+        #uwsgi_param UWSGI_SCRIPT run:app;           # 项目的主程序，比如你测试用run.py文件，文件中app = Flask(__name__)，那么这里就填run:app
+    } 
+
+    } 
+}

@@ -59,7 +59,9 @@ void display(struct ASTNode *,int);
 
 %%
 //program: 初始语法单元
-program: ExtDefList    { display($1,0);}     //显示语法树,语义分析
+program: ExtDefList    { //display($1,0); 
+                         semantic_Analysis0($1);
+                        }     //显示语法树,语义分析
          ; 
 //ExtDefList: 零个或多个ExtDef
 ExtDefList:                   {$$=NULL;}

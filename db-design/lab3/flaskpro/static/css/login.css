@@ -1,0 +1,46 @@
+body {
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+
+.middle {
+    margin-top: 110px;
+    margin-bottom: 110px;
+    padding: 100px 50px 50px 50px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 10px 10px 5px rgb(0, 0, 0);
+
+}
+
+.login {
+    margin-left: 20px;
+}
+
+.font2 {
+    font-size: 0.6em;
+}
+
+.btn {
+    border-radius: 28px;
+}
+
+.login-form-title {
+    font-size: 24px;
+    color: #333333;
+    line-height: 1.2;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding-bottom: 54px;
+}
+
+.wrap-login {
+    display: flex;
+    padding: 89px 84px 86px 54px;
+}
+
+.title{
+    color: #333333;
+    font-size: 30px;
+    text-shadow : rgba(255,255,255,0.5) 0 5px 6px, rgba(255,255,255,0.2) 1px 3px 3px;
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap-clearmin.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/roboto.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/font-awesome.min.css">
+      <link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon">
+
+    <title>企业工资管理系统</title>
+    <style></style>
+  </head>
+  <body class="cm-login">
+
+    <div class="text-center" style="padding:90px 0 30px 0;background:#fff;border-bottom:1px solid #ddd">
+      <img src="../static/img/logo-big.svg" width="300" height="45">
+    </div>
+    
+    <div class="col-sm-6 col-md-4 col-lg-3" style="margin:40px auto; float:none;">
+
+	<div class="col-xs-12">
+          <div class="form-group">
+	    <div class="input-group">
+	      <div class="input-group-addon"><i class="fa fa-fw fa-user"></i></div>
+	      <input type="text" name="username" class="form-control" placeholder="UID" id="uid">
+	    </div>
+          </div>
+          <div class="form-group">
+	    <div class="input-group">
+	      <div class="input-group-addon"><i class="fa fa-fw fa-lock"></i></div>
+	      <input type="password" name="password" class="form-control" placeholder="Password" id="password">
+	    </div>
+          </div>
+        </div>
+	<div class="col-xs-6">
+          <div class="checkbox"><label><input type="checkbox"> Remember me</label></div>
+	</div><div class="col-xs-6">
+          <button type="button" class="btn btn-block btn-primary" id="submitBtn">Sign in</button>
+        </div>
+    </div>
+
+
+   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script type="text/javascript">
+        const submitBtn = document.getElementById('submitBtn'); // 提交按钮
+        submitBtn.addEventListener('click',()=>{
+        const inputItems = ['uid', 'password'];// 表单项几个 key
+        const values = {}; // 初始化返回数据
+        inputItems.forEach(key => {
+        // 遍历 inputItems，获取对应的 input 上的 value
+        // 如果 value 有值， 则添加相应的项
+        const value = document.getElementById(key).value;
+        if (!value) return;
+        values[key] = value
+        });
+        axios({
+            method: 'post',
+            url: '/login/post',
+            data: values
+        })
+        .then(function (response) {//处理返回成功的结果
+            if(response['data']['res'] === true){
+                console.log(response['data']);
+                window.location.href = response['data']['target'];//重定向到目标页面
+            }
+        })
+        .catch(function (error) {
+			alert("密码或用户名错误！请重试");
+			console.log(error);
+        });
+    })
+
+	</script>
+  </body>
+</html>

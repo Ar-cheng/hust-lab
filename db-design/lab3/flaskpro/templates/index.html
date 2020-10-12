@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>工资管理系统</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="../static/css/index.css">
+    <link rel="stylesheet" href="../static/css/font-awesome.css">
+    <link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon">
+
+
+</head>
+
+<body>
+
+    <div id="main">
+        <v-app>
+            <v-navigation-drawer app>
+                <v-list-item>
+                    <v-list-item-content>
+                        <v-list-item-title class="title">
+                            企业工资管理系统
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+
+                <v-divider></v-divider>
+
+                <v-list dense nav shaped>
+                    <v-list-item-group mandatory Flat color="primary">
+                        <v-list-item link @click="show('employee_info')">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-user-circle</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>员工信息</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+
+                        <v-list-item link @click="show('employee_info_add')">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-plus</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>添加员工</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+
+                        <v-list-item link @click="get_department">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-users</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>部门信息</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item link @click="get_kind">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-bars</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>工种信息</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item link @click="get_attendance">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-map-marker</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>考勤信息</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item link @click="get_bonus">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-usd</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>津贴信息</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item link @click="get_salary">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-credit-card</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>工资信息</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+
+                        <v-list-item link @click="get_log">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-shield</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>账号管理</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item link @click="get_salary_report">
+                            <v-list-item-icon>
+                                <v-icon dense>fa fa-bar-chart</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>企业工资报表</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
+
+
+            </v-navigation-drawer>
+
+
+            <v-app-bar app>
+                欢迎登陆，{{ login_user }}
+                <v-btn rounded right fixed color="orange darken-2" dark @click="logout">>
+                    <v-icon dark left>mdi-arrow-left</v-icon>
+                    log out
+                </v-btn>
+
+            </v-app-bar>
+            <!-- Sizes your content based upon application components -->
+            <v-content>
+                <!-- 员工基本信息 -->
+                <v-card v-if="display.employee_info">
+                    <v-card-title>
+                        员工基本信息
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('employee_info')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+                    <v-data-table :headers="employee_headers" :items="employee_info" :search="search"></v-data-table>
+
+                    <v-container>
+                        <v-row>
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model="employee_info_add.UID" :counter="10" label="工号" required>
+                                </v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model="employee_info_add.UName" label="姓名" required>
+                                </v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="1">
+                                <v-text-field v-model="employee_info_add.Age" label="年龄" required></v-text-field>
+                            </v-col>
+
+                            <v-col class="d-flex" cols="12" md="1">
+                                <v-select v-model="employee_info_add.Sex" :items="Sex_info" label="性别" required>
+                                </v-select>
+                            </v-col>
+
+                            <v-col cols="12" md="1">
+                                <v-text-field v-model="employee_info_add.DID" label="部门编号" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="1">
+                                <v-text-field v-model="employee_info_add.KID" label="工种编号" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="1">
+                                <v-btn class="ma-2" outlined color="indigo" @click="employee_info_update">
+                                    <v-icon dark>fa fa-pencil</v-icon>
+                                </v-btn>
+                            </v-col>
+
+                            <v-col cols="12" md="1">
+                                <v-btn class="ma-2" outlined color="red" @click="employee_info_delete">
+                                    <v-icon dark right>fa fa-times</v-icon>
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-card>
+
+                <v-card v-if="display.employee_info_add">
+                    <v-card-title>
+                        添加员工
+                    </v-card-title>
+
+                    <v-form v-model="valid">
+                        <v-container>
+                            <v-row>
+                                <v-col cols="12" md="2">
+                                    <v-text-field v-model="employee_info_add.UName" :counter="10" label="姓名" required>
+                                    </v-text-field>
+                                </v-col>
+
+                                <v-col cols="12" md="2">
+                                    <v-text-field v-model="employee_info_add.Age" label="年龄" required></v-text-field>
+                                </v-col>
+
+                                <v-col class="d-flex" cols="12" md="2">
+                                    <v-select v-model="employee_info_add.Sex" :items="Sex_info" label="性别" required>
+                                    </v-select>
+                                </v-col>
+                            </v-row>
+
+                            <v-row>
+                                <v-col cols="12" md="2">
+                                    <v-text-field v-model="employee_info_add.UID" label="工号" required></v-text-field>
+                                </v-col>
+
+                                <v-col cols="12" md="2">
+                                    <v-text-field v-model="employee_info_add.DID" label="部门编号" required></v-text-field>
+                                </v-col>
+
+                                <v-col cols="12" md="2">
+                                    <v-text-field v-model="employee_info_add.KID" label="工种编号" required></v-text-field>
+                                </v-col>
+
+                            </v-row>
+
+                            <v-row>
+                                <div class="text-center">
+                                    <v-btn class="ma-2" outlined color="indigo" @click="employee_info_reset">
+                                        <v-icon> fa fa-refresh</v-icon>
+                                        &nbsp RESET
+                                    </v-btn>
+                                    <v-btn class="ma-2" outlined color="teal" @click="employee_info_submit">
+                                        <v-icon dark>mdi-cloud-upload</v-icon>
+                                        &nbsp SUBMIT
+                                    </v-btn>
+                                </div>
+
+                            </v-row>
+
+                        </v-container>
+                    </v-form>
+
+                </v-card>
+
+                <v-card v-if="display.department_info">
+                    <v-card-title>
+                        部门信息
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('department_info')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+                    <v-data-table :headers="department_headers" :items="department_info" :search="search">
+                    </v-data-table>
+                    <v-container>
+                        <!-- add_kind_info or update or delete -->
+                        <v-row>
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" department_info_add.DID" label="部门编号" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" department_info_add.DName" label="部门名称" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-text-field v-model=" department_info_add.DRef" label="备注"></v-text-field>
+                            </v-col>
+
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="2">
+                                <v-btn class="ma-2" outlined color="teal" @click="department_info_submit">
+                                    <v-icon dark>mdi-cloud-upload</v-icon>
+                                    &nbsp 添加
+                                </v-btn>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-btn class="ma-2" outlined color="teal" @click="department_info_update">
+                                    <v-icon dark>fa fa-pencil</v-icon>
+                                    &nbsp 更新
+                                </v-btn>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-btn class="ma-2" outlined color="red" dark @click="department_info_delete">
+                                    <v-icon dark right>fa fa-times</v-icon>
+                                    &nbsp 删除
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+
+                </v-card>
+
+                <v-card v-if="display.kind_info">
+                    <v-card-title>
+                        工种信息
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('kind_info')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+                    <v-data-table :headers="kind_headers" :items="kind_info" :search="search"></v-data-table>
+
+                    <v-container>
+                        <!-- add_kind_info or update or delete -->
+                        <v-row>
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" kind_info_add.KID" label="工种编号" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" kind_info_add.KName" label="工种名称" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" kind_info_add.Level" label="职阶" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" kind_info_add.Base_salary" label="基本薪资" required></v-text-field>
+                            </v-col>
+                        </v-row>
+
+                        <v-row>
+                            <v-col cols="12" md="2">
+                                <v-btn class="ma-2" outlined color="teal" @click="kind_info_submit">
+                                    <v-icon dark>mdi-cloud-upload</v-icon>
+                                    &nbsp 添加
+                                </v-btn>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-btn class="ma-2" outlined color="teal" @click="kind_info_update">
+                                    <v-icon dark>fa fa-pencil</v-icon>
+                                    &nbsp 更新
+                                </v-btn>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-btn class="ma-2" outlined color="red" dark @click="kind_info_delete">
+                                    <v-icon dark right>fa fa-times</v-icon>
+                                    &nbsp 删除
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+
+                </v-card>
+
+                <v-card v-if="display.bonus_info">
+                    <v-card-title>
+                        津贴信息
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('bonus_info')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+                    <v-data-table :headers="bonus_headers" :items="bonus_info" :search="search"></v-data-table>
+                    <v-container>
+
+                        <!-- add_bonus_info or update or delete -->
+                        <v-row>
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" bonus_info_add.UID" label="UID" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" bonus_info_add.BDate" label="日期" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" bonus_info_add.BType" label="津贴类型" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" bonus_info_add.BDays" label="天数" required></v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model=" bonus_info_add.Bonus" label="津贴" required></v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                    <v-row>
+                        <v-col cols="12" md="2">
+                            <v-btn class="ma-2" outlined color="teal" @click="bonus_info_submit">
+                                <v-icon dark>mdi-cloud-upload</v-icon>
+                                &nbsp 添加
+                            </v-btn>
+                        </v-col>
+
+                        <v-col cols="12" md="2">
+                            <v-btn class="ma-2" outlined color="teal" @click="bonus_info_update">
+                                <v-icon dark>fa fa-pencil</v-icon>
+                                &nbsp 更新
+                            </v-btn>
+                        </v-col>
+
+                        <v-col cols="12" md="2">
+                            <v-btn class="ma-2" outlined color="red" dark @click="bonus_info_delete">
+                                <v-icon dark right>fa fa-times</v-icon>
+                                &nbsp 删除
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+
+                </v-card>
+
+                <v-card v-if="display.salary_info">
+                    <v-card-title>
+                        薪资信息
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('salary_info')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+                    <v-data-table :headers="salary_headers" :items="salary_info" :search="search"></v-data-table>
+
+                </v-card>
+
+                <v-card v-if="display.attendance_info">
+                    <v-card-title>
+                        考勤信息
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('attendance_info')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+                    <v-data-table :headers="attendance_headers" :items="attendance_info" :search="search">
+                    </v-data-table>
+
+                </v-card>
+
+                <v-card v-if="display.log_info">
+                    <v-card-title>
+                        账号管理
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('log_info')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+                    <v-data-table :headers="log_headers" :items="log_info" :search="search">
+                    </v-data-table>
+                    <v-container>
+
+                        <v-row>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model="log_info_add.UID" :counter="10" label="UID" required>
+                                </v-text-field>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-text-field v-model="log_info_add.Password" label="密码" required>
+                                </v-text-field>
+                            </v-col>
+
+                            <v-col class="d-flex" cols="12" md="2">
+                                <v-select v-model="log_info_add.Authority" :items="log_authority_items" label="权限"
+                                    required>
+                                </v-select>
+                            </v-col>
+
+                            <v-col cols="12" md="2">
+                                <v-btn class="ma-2" outlined color="indigo" @click="log_info_update">
+                                    <v-icon dark>fa fa-pencil</v-icon>修改账号信息
+                                </v-btn>
+                            </v-col>
+
+                        </v-row>
+                    </v-container>
+                </v-card>
+
+                <v-card v-if="display.salary_report">
+                    <v-card-title>
+                        工资报表
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="green" @click="info_refresh('salary_report')">
+                                <v-icon>mdi-cached</v-icon>
+                            </v-btn>
+                        </v-col>
+
+                        <v-col cols="12" sm="4">
+                            <v-btn icon color="red" @click="analysis">
+                                <v-icon>mdi-checkbox-marked-circle</v-icon>分析部门薪资
+                            </v-btn>
+                        </v-col>
+
+                        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line
+                            hide-details></v-text-field>
+                    </v-card-title>
+
+                    <v-data-table :headers="salary_report_headers" :items="salary_report" :search="search">
+                    </v-data-table>
+
+                    <div id="mycharts" style="width: 600px;height:400px;"></div>
+
+                </v-card>
+
+            </v-content>
+            <v-footer app>
+                数据库管理系统-朱志成
+            </v-footer>
+        </v-app>
+
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script src="../static/js/index.js"></script>
+</body>
+
+</html>
